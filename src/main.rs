@@ -8,8 +8,15 @@ fn main() -> std::io::Result<()> {
             .connect("8.8.8.8:53")
             .expect("connect function failed");
         socket.send(&query).expect("couldn't send message");
+        let mut buf = [0; 1024];
+        match socket.recv(&mut buf) {
+            Ok(received) => {
+                println!("{:x?}", &buf[..received]);
+                Ok(())
+            }
+            Err(e) => Err(e),
+        }
     }
-    Ok(())
 }
 
 // GOAL: Make a `Query` asking for the IP address for `google.com`
