@@ -1,7 +1,9 @@
+#![allow(dead_code)]
+
 use std::net::UdpSocket;
 
 fn main() -> std::io::Result<()> {
-    let query = build_query("example.com");
+    let query = build_query("metafilter.com");
     {
         let socket = UdpSocket::bind("0.0.0.0:0").expect("failed to bind socket");
         socket
@@ -164,7 +166,7 @@ struct DnsRecord {
     class_: u16,
     ttl: u32,
     data_length: u16,
-    data: Vec<u8>,
+    data: std::net::Ipv4Addr,
 }
 
 impl DnsRecord {
@@ -194,6 +196,7 @@ impl DnsRecord {
             ]);
             let data_length = u16::from_be_bytes([data[idx + 9 + 18], data[idx + 10 + 18]]);
             let data = data[idx + 11 + 18..].to_vec();
+            let data = std::net::Ipv4Addr::new(data[0], data[1], data[2], data[3]);
             DnsRecord {
                 name: parts,
                 type_,
